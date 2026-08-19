@@ -18,7 +18,7 @@ pipeline {
         script { env.FAILED_STAGE = 'Checkout' }
         checkout scm
         script {
-          env.IMAGE_TAG = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+          env.IMAGE_TAG  = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
           env.GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
           env.GIT_BRANCH = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
         }
@@ -41,58 +41,66 @@ pipeline {
 
     stage('Build image') {
       steps {
-        script { env.FAILED_STAGE = 'Build' }
-        docker.build("${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}")
+        script {
+          env.FAILED_STAGE = 'Build'
+          docker.build("${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}")
+        }
       }
     }
 
     stage('Push to ECR') {
       steps {
-        script { env.FAILED_STAGE = 'Push' }
-        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-                           credentialsId: 'aws-creds']]) {
-          sh """
-            aws ecr get-login-password --region ${AWS_REGION} | \
-              docker login --username AWS --password-stdin ${ECR_REGISTRY}
-            docker push ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}
-          """
+        script {
+          env.FAILED_STAGE = 'Push'
+          withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                             credentialsId: 'aws-creds']]) {
+            sh """
+              aws ecr get-login-password --region ${AWS_REGION} | \
+                docker login --username AWS --password-stdin ${ECR_REGISTRY}
+              docker push ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}
+            """
+          }
         }
       }
     }
 
     stage('Deploy to EC2') {
       steps {
-        script { env.FAILED_STAGE = 'Deploy' }
-        sshagent(credentials: ['ec2-ssh-key']) {
-          sh """
-            ssh -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} '
-              aws ecr get-login-password --region ${AWS_REGION} | \
-                docker login --username AWS --password-stdin ${ECR_REGISTRY} &&
-              docker pull ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG} &&
-              docker stop flask-app || true &&
-              docker rm flask-app || true &&
-              docker run -d --name flask-app --restart unless-stopped \
-                -p 5000:5000 \
-                -e MONGO_URI="${MONGO_URI}" \
-                ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}
-            '
-          """
+        script {
+          env.FAILED_STAGE = 'Deploy'
+          sshagent(credentials: ['ec2-ssh-key']) {
+            sh """
+              ssh -o StrictHostKeyChecking=no ubuntu@${EC2_HOST} '
+                aws ecr get-login-password --region ${AWS_REGION} | \
+                  docker login --username AWS --password-stdin ${ECR_REGISTRY} &&
+                docker pull ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG} &&
+                docker stop flask-app || true &&
+                docker rm flask-app || true &&
+                docker run -d --name flask-app --restart unless-stopped \
+                  -p 5000:5000 \
+                  -e MONGO_URI="${MONGO_URI}" \
+                  ${ECR_REGISTRY}/${ECR_REPO}:${IMAGE_TAG}
+              '
+            """
+          }
         }
       }
     }
 
     stage('Verify deployment') {
       steps {
-        script { env.FAILED_STAGE = 'Verify' }
-        sh """
-          for i in 1 2 3 4 5; do
-            sleep 5
-            STATUS=\$(curl -s -o /dev/null -w '%{http_code}' http://${EC2_HOST}:5000/health)
-            if [ "\$STATUS" = "200" ]; then exit 0; fi
-          done
-          echo "Health check failed after 5 attempts"
-          exit 1
-        """
+        script {
+          env.FAILED_STAGE = 'Verify'
+          sh """
+            for i in 1 2 3 4 5; do
+              sleep 5
+              STATUS=\$(curl -s -o /dev/null -w '%{http_code}' http://${EC2_HOST}:5000/health)
+              if [ "\$STATUS" = "200" ]; then exit 0; fi
+            done
+            echo "Health check failed after 5 attempts"
+            exit 1
+          """
+        }
       }
     }
   }

@@ -66,6 +66,6 @@ def test_delete_student(client):
 # test_app.py
 def test_health_ok(client):
     resp = client.get("/health")
-    assert resp.status_code == 999   # Replaced to test Failure case   
+    assert resp.status_code in (200, 503)   # Replaced to test Failure case   
     assert "status" in resp.get_json()
 

@@ -9,7 +9,7 @@
 ![MongoDB](https://img.shields.io/badge/mongodb-database-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
 ![Tests](https://img.shields.io/badge/tests-pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)
 
-> 🎓 **Graded Assignment — CI/CD Pipeline**
+>  **CI/CD Pipeline**
 > Built and validated end‑to‑end: source control → automated testing → containerization → deployment → health verification → email notification.
 
 ---
@@ -134,13 +134,312 @@ pytest -v
 # 5️⃣ Build the Docker image
 docker build -t flask-student-app:local .
 ```
-
 </td></tr>
 </table>
+------------------
 
-> 💡 **Tip:** Run the app and tests locally *before* wiring up Jenkins — it's far faster to debug on your own machine than inside a pipeline log.
+
+## Forked Repo
+
+<img width="1225" height="672" alt="image" src="https://github.com/user-attachments/assets/7eab88c0-71b7-410d-abb2-6bcdc631198b" />
+
+-----------------
+**Git Clone
+
+<img width="1223" height="540" alt="Untitled 4" src="https://github.com/user-attachments/assets/1eec6a40-71dc-4c8a-86dc-5a00446e6eeb" />
+
+----------------
+
+## Added matching pytest case 
+
+```
+# test_app.py
+def test_health_ok(client):
+    resp = client.get("/health")
+    assert resp.status_code in (200, 503)   # route responds either way
+    assert "status" in resp.get_json()
+
+
+```
+
+-------------
+
+Dockerfile & .dockerignore
+
+```
+Dockerfile
+FROM python:3.11-slim
+ 
+WORKDIR /app
+ 
+# Install dependencies first so Docker can cache this layer
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+ 
+# Now copy the rest of the app
+COPY . .
+ 
+EXPOSE 5000
+ 
+# Gunicorn for a production-grade WSGI server instead of Flask's dev server
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "app:app"]
+
+```
+
+-------------
+
+.dockerignore
+
+```
+__pycache__/
+*.pyc
+.git
+.gitignore
+.env
+.env.example
+venv/
+*.md
+tests/
+.pytest_cache/
+
+```
+
+----------
+
+## Create the ECR repository
+
+
+```
+1.AWS Console → search "ECR" → Elastic Container Registry.
+2.Repositories → Create repository.
+3.Visibility: Private. Name: flask-practice (or match your repo name).
+3.Leave "Tag immutability" off during dev; scan-on-push can stay enabled — it's free and useful.
+4.Create repository, then copy the URI shown
+
+```
+
+---------
+
+## Launch the EC2 instances 
+
+One instance runs Jenkins itself (the controller). The other is the deployment target the app actually runs on. Launch both the same way, with different names and security groups.
+
+## 🖥️ EC2 Instances Overview
+
+| Instance   | Name                | Type                          | Purpose                                      |
+|------------|---------------------|-------------------------------|----------------------------------------------|
+| Controller | jenkins-controller  | t2.medium / t3.medium         | Runs Jenkins, builds images, triggers deploys |
+| App target | flask-practice-app  | t2.micro / t3.micro (free-tier eligible) | Runs the deployed Flask container |
+
+
+## 🔐 Security Group Rules
+
+| Type       | Port | Source       | Purpose                                      |
+|------------|------|--------------|----------------------------------------------|
+| SSH        | 22   | Your IP /32  | You SSH in to install Jenkins and troubleshoot |
+| Custom TCP | 8080 | Your IP /32 (or a small trusted range) | Jenkins web UI access |
+
+----------
+
+Jenkins-Controller instance 
+
+<img width="1190" height="612" alt="image" src="https://github.com/user-attachments/assets/e53cec22-4cfc-4b66-a193-43f880ae083e" />
+
+------------
+
+Flask-practice app Instance 
+
+
+<img width="1192" height="606" alt="image" src="https://github.com/user-attachments/assets/f0c9c8ab-50f3-4594-9459-6a25c643a860" />
+
+------------
+ # Installed  Docker on both instances
+
+
+ ```
+# Update package index
+sudo apt-get update -y
+
+# Install Docker and AWS CLI
+sudo apt-get install -y docker.io awscli
+
+# Enable and start Docker service
+sudo systemctl enable docker --now
+
+# Add the ubuntu user to the docker group (so you can run docker without sudo)
+sudo usermod -aG docker ubuntu
+
+```
+-------
+
+Java
+
+<img width="1235" height="60" alt="image" src="https://github.com/user-attachments/assets/a863eaf0-d8cf-43dc-8b8e-7812a584da7b" />
+
+-----
+
+Docker
+
+---------
+<img width="1233" height="285" alt="image" src="https://github.com/user-attachments/assets/db439897-77db-4fd4-9589-aa933dc62750" />
+
+----------
+
+---------
+
+## IAM role for ECR pull (app target)
+
+## 🔑 Authentication & Access Approach
+
+| Approach                                | How it works                                                                 | Used in this guide |
+|-----------------------------------------|-------------------------------------------------------------------------------|--------------------|
+| EC2 instance role on `flask-practice-app` | Lets the EC2 box pull from ECR without storing AWS keys locally               | ✅ Yes — for the `docker pull` during deploy |
+| IAM user + access keys (Jenkins Credentials) | Jenkins authenticates to AWS directly to push the image to ECR                | ✅ Yes — for the Build/Push stages |
+
+------
+
+<img width="1232" height="617" alt="image" src="https://github.com/user-attachments/assets/5ad8c699-1a7c-499e-b205-fc5859ea1e03" />
+
+------
+
+<img width="1235" height="275" alt="image" src="https://github.com/user-attachments/assets/9cade829-955f-4dbc-94ab-1082a98b02d0" />
+
+-----
+
+<img width="1230" height="620" alt="image" src="https://github.com/user-attachments/assets/c4703bbd-f6fa-421c-9aa7-997d3f597afc" />
+
+-----
+
+## AM user for Jenkins (push access)
+
+
+<img width="1231" height="559" alt="image" src="https://github.com/user-attachments/assets/d3bb1241-e53c-468a-a0ae-6eee9f29e37a" />
+
+-----
+
+<img width="1234" height="524" alt="image" src="https://github.com/user-attachments/assets/ab6bbe3f-adf6-4c84-8e78-f9b166a2f9d1" />
+
+----
+<img width="1232" height="601" alt="image" src="https://github.com/user-attachments/assets/1da33f78-2f2a-4fb3-b504-9a6d9a1e662e" />
+
+----
+
+## Install & Configure Jenkins
+
+<img width="1234" height="244" alt="image" src="https://github.com/user-attachments/assets/a5c6f028-5052-4ce2-8b0b-4033fa80c17b" />
 
 ---
+<img width="1232" height="493" alt="image" src="https://github.com/user-attachments/assets/bf88d8f1-fd18-4c03-be53-9ae1a5e52f21" />
+
+---
+-----
+
+## Configure the SMTP server for emailext in Jenkins
+
+
+```
+Manage Jenkins → System → scroll to Extended E-mail Notification.
+SMTP server: smtp.gmail.com. SMTP Port: 465. Check Use SSL.
+Advanced → check Use SMTP Authentication → enter your Gmail address and the App Password from Section 9.
+Default Content Type: HTML. Default Recipients: your notification email.
+Save, then use the built-in "test configuration" button to confirm a test email arrives before writing the pipeline.
+
+```
+
+---------
+<img width="1228" height="303" alt="image" src="https://github.com/user-attachments/assets/33e19947-8b3b-4d55-aa16-a22c61213b5e" />
+
+----------
+## Configure Jenkins Credentials
+
+------
+
+
+## 🔒 Credentials Setup
+
+| Credential ID | Kind                  | Value                                                                 |
+|---------------|-----------------------|-----------------------------------------------------------------------|
+| aws-creds     | AWS Credentials       | Access Key ID / Secret Access Key from the `jenkins-cicd` IAM user     |
+| ec2-ssh-key   | SSH Username + Key    | Username: `ubuntu` · Key: full contents of `flask-practice-key.pem`    |
+| mongo-uri     | Secret text           | Your MongoDB Atlas connection string                                   |
+| ecr-registry  | Secret text           | `<account-id>.dkr.ecr.<region>.amazonaws.com`                          |
+| ecr-repo-name | Secret text           | e.g. `flask-practice`                                                  |
+| ec2-app-host  | Secret text           | Public IP or DNS of `flask-practice-app`                               |
+| notify-email  | Secret text           | Email address where success/failure notifications should be sent       |
+
+
+
+---------
+<img width="1231" height="575" alt="image" src="https://github.com/user-attachments/assets/b6807160-0ed3-4df2-bcbf-9477e54d2e36" />
+
+----------
+## Add the webhook on GitHub
+
+---------------------
+
+
+<img width="1238" height="648" alt="image" src="https://github.com/user-attachments/assets/81a0c9f6-d193-4840-a4d5-a07dd18dd4b8" />
+
+
+---------
+## Jenkins Pipeline 
+----------
+
+???????
+
+```
+
+```
+
+---------
+
+----------
+
+```
+
+```
+
+---------
+
+----------
+
+```
+
+```
+
+---------
+
+----------
+
+```
+
+```
+
+---------
+----------
+
+```
+
+```
+
+---------
+----------
+
+```
+
+```
+
+---------
+----------
+
+```
+
+```
+
+---------
+
+
+
 
 ## 🔄 Pipeline Stages in Detail
 

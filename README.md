@@ -355,24 +355,6 @@ Save, then use the built-in "test configuration" button to confirm a test email 
 ------
 
 
-## 🔒 Credentials Setup
-
-| Credential ID | Kind                  | Value                                                                 |
-|---------------|-----------------------|-----------------------------------------------------------------------|
-| aws-creds     | AWS Credentials       | Access Key ID / Secret Access Key from the `jenkins-cicd` IAM user     |
-| ec2-ssh-key   | SSH Username + Key    | Username: `ubuntu` · Key: full contents of `flask-practice-key.pem`    |
-| mongo-uri     | Secret text           | Your MongoDB Atlas connection string                                   |
-| ecr-registry  | Secret text           | `<account-id>.dkr.ecr.<region>.amazonaws.com`                          |
-| ecr-repo-name | Secret text           | e.g. `flask-practice`                                                  |
-| ec2-app-host  | Secret text           | Public IP or DNS of `flask-practice-app`                               |
-| notify-email  | Secret text           | Email address where success/failure notifications should be sent       |
-
-
-
----------
-<img width="1231" height="575" alt="image" src="https://github.com/user-attachments/assets/b6807160-0ed3-4df2-bcbf-9477e54d2e36" />
-
-----------
 ## Add the webhook on GitHub
 
 ---------------------
@@ -527,20 +509,33 @@ Emails are sent via **Jenkins Email Extension (`emailext`)** using credential-st
 
 All sensitive values live in **Jenkins Credentials** — nothing is committed to the repository:
 
-| Credential ID | Kind | Contains |
-|---|---|---|
-| `github-token` | Username/Password | GitHub PAT (scope: `repo`) |
-| `github-webhook-secret` | Secret text | Webhook shared secret |
-| `mongo-uri` | Secret text | Database connection string |
-| `smtp-creds` | Username/Password | Email address + App Password |
+
+| Credential ID | Kind                  | Value                                                                 |
+|---------------|-----------------------|-----------------------------------------------------------------------|
+| aws-creds     | AWS Credentials       | Access Key ID / Secret Access Key from the `jenkins-cicd` IAM user     |
+| ec2-ssh-key   | SSH Username + Key    | Username: `ubuntu` · Key: full contents of `flask-practice-key.pem`    |
+| mongo-uri     | Secret text           | Your MongoDB Atlas connection string                                   |
+| ecr-registry  | Secret text           | `<account-id>.dkr.ecr.<region>.amazonaws.com`                          |
+| ecr-repo-name | Secret text           | e.g. `flask-practice`                                                  |
+| ec2-app-host  | Secret text           | Public IP or DNS of `flask-practice-app`                               |
+| notify-email  | Secret text           | Email address where success/failure notifications should be sent       |
+
+
+
+---------
+<img width="1231" height="575" alt="image" src="https://github.com/user-attachments/assets/b6807160-0ed3-4df2-bcbf-9477e54d2e36" />
+
+----------
+
 
 `.env`, credentials, and keys are all listed in `.gitignore` and never appear in pipeline logs or source.
 
 ---
 
-## 📸 Screenshots & Evidence
+## 📸 Screenshots & Evidence Pipeline stages present and passing in correct order 
 
-> Paste your screenshots below each heading — these are the exact deliverables the grading rubric expects.
+
+## Output A -  Successfull Pipeline Execution 
 
 ### 1. ✅ Full pipeline run — all stages green
 ```
@@ -551,6 +546,15 @@ All sensitive values live in **Jenkins Credentials** — nothing is committed to
 ```
 [ 📷 PASTE SCREENSHOT HERE — inbox showing the ✅ SUCCESS email with commit/image/link ]
 ```
+
+### 5. 🌐 Live application check
+```
+[ 📷 PASTE SCREENSHOT HERE — browser or curl output confirming the app is live and /health returns 200 ]
+```
+
+
+## Output B -  Pipeline Failing test
+
 
 ### 3. 🛑 Intentionally broken run — pipeline stops early
 ```
@@ -569,60 +573,6 @@ All sensitive values live in **Jenkins Credentials** — nothing is committed to
 
 ---
 
-## 📊 Grading Rubric Compliance
-
-| Criterion | Weight | ✅ Where it's demonstrated |
-|---|:---:|---|
-| Pipeline stages present & passing in correct order (test gates build/deploy) | **25%** | `Jenkinsfile` stages 1–7 · [Pipeline run screenshot](#1--full-pipeline-run--all-stages-green) |
-| Docker image built correctly, tagged with commit SHA | **15%** | [Build stage](#4️⃣-build--sha-tagged-image-) — `IMAGE_TAG = env.GIT_COMMIT.take(7)` |
-| Image successfully pushed | **10%** | [Push stage](#5️⃣-push) |
-| Deployment actually replaces the running container (not a fresh install each time) | **20%** | [Deploy stage](#6️⃣-deploy--real-container-replacement-) — explicit `stop` + `rm` before `run` |
-| Deploy-verification step (health check) genuinely gates success/failure | **10%** | [Verify stage](#7️⃣-verify--the-deploy-verification-gate-) — retry loop against `/health`, non‑zero exit on failure |
-| Email notification — customized content, correct on both paths | **15%** | [Email Notifications](#-email-notifications) · success & failure screenshots |
-| README documentation quality | **5%** | This document 📄 |
-| **Total** | **100%** | |
-
----
-
-## 🖥️ Environment Note: Local vs. AWS
-
-This project's pipeline **logic** — test gate, SHA image tagging, real container replacement, health-check gate, and differentiated success/failure emails — is identical regardless of where it runs. The infrastructure underneath can be either fully **AWS-based** (ECR + EC2, per the official assignment brief) or run **entirely locally** for practice/validation, with the container registry and deploy target substituted by local Docker.
-
-| Pipeline Stage | Local Variant | AWS Variant |
-|---|---|---|
-| Database | MongoDB in a local Docker container | MongoDB Atlas / EC2-hosted |
-| Registry | None — image stays in the local Docker engine | Amazon ECR |
-| Deploy mechanism | `docker run` on the same machine | SSH (or SSM) into EC2 |
-| Webhook reachability | ngrok tunnel → localhost | Public EC2 IP |
-| Credentials needed | GitHub token, DB URI, SMTP | + AWS credentials, SSH private key |
-
-> ⚠️ **Note for grader:** please confirm which variant is expected as the graded submission for this run, since the official rubric is scoped around real ECR + EC2 usage. The pipeline mechanics, gating logic, and notification behavior are unchanged either way.
-
----
-
-## 🛠️ Reproducing a Deployment Manually
-
-If the pipeline were unavailable, the same steps can be run by hand:
-
-```bash
-# Build
-docker build -t flask-student-app:<git-sha> .
-
-# Stop & remove the existing container
-docker stop flask-app || true
-docker rm flask-app || true
-
-# Run the new container
-docker run -d --name flask-app \
-  -p <PORT>:5000 \
-  -e MONGO_URI="<connection-string>" \
-  flask-student-app:<git-sha>
-
-# Verify
-curl http://<host>:<PORT>/health
-```
-
----
 
 ## 👤 Author
 

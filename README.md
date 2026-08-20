@@ -25,7 +25,7 @@
 7. [Pipeline Stages](#-pipeline-stages-in-detail)
 8. [Email Notifications](#-email-notifications)
 9. [Secrets Management](#-secrets-management)
-11. [A full pipeline run Screenshots & Evidence](#-A-full-pipeline-run-Screenshots-&-Evidence) ✅
+11. [A full pipeline run Screenshots & Evidence](#a-full-pipeline-run-screenshots--evidence) ✅
 12. [Author](#-author)
 
 ---

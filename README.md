@@ -25,11 +25,8 @@
 7. [Pipeline Stages](#-pipeline-stages-in-detail)
 8. [Email Notifications](#-email-notifications)
 9. [Secrets Management](#-secrets-management)
-10. [Screenshots & Evidence](#-screenshots--evidence)
-11. [Grading Rubric Compliance](#-grading-rubric-compliance)
-12. [Environment Note: Local vs. AWS](#-environment-note-local-vs-aws)
-13. [Reproducing a Deployment Manually](#-reproducing-a-deployment-manually)
-14. [Author](#-author)
+10. [A full pipeline run Screenshots & Evidence](#-screenshots--evidence) ✅
+11. [Author](#-author)
 
 ---
 

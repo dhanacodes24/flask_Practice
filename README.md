@@ -25,8 +25,8 @@
 7. [Pipeline Stages](#-pipeline-stages-in-detail)
 8. [Email Notifications](#-email-notifications)
 9. [Secrets Management](#-secrets-management)
-10. [A full pipeline run Screenshots & Evidence](#-screenshots--evidence) ✅
-11. [Author](#-author)
+11. [A full pipeline run Screenshots & Evidence](#-A-full-pipeline-run-Screenshots-&-Evidence) ✅
+12. [Author](#-author)
 
 ---
 
@@ -361,59 +361,7 @@ Save, then use the built-in "test configuration" button to confirm a test email 
 
 
 ---------
-## Jenkins Pipeline 
-----------
 
-???????
-
-```
-
-```
-
----------
-
-----------
-
-```
-
-```
-
----------
-
-----------
-
-```
-
-```
-
----------
-
-----------
-
-```
-
-```
-
----------
-----------
-
-```
-
-```
-
----------
-----------
-
-```
-
-```
-
----------
-----------
-
-```
-
-```
 
 ---------
 
@@ -528,6 +476,8 @@ All sensitive values live in **Jenkins Credentials** — nothing is committed to
 `.env`, credentials, and keys are all listed in `.gitignore` and never appear in pipeline logs or source.
 
 ---
+
+## A full pipeline run Screenshots & Evidence
 
 ## 📸 Screenshots & Evidence Pipeline stages present and passing in correct order 
 

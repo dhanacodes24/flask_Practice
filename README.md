@@ -25,7 +25,7 @@
 7. [Pipeline Stages](#-pipeline-stages-in-detail)
 8. [Email Notifications](#-email-notifications)
 9. [Secrets Management](#-secrets-management)
-11. [A full pipeline run Screenshots & Evidence](#a-full-pipeline-run-screenshots-and-evidence) ✅
+11. [A full pipeline run Screenshots & Evidence](#A-full-pipeline-run-Screenshots-and-Evidence) ✅
 12. [Author](#-author)
 
 ---
@@ -136,18 +136,18 @@ docker build -t flask-student-app:local .
 ------------------
 
 
-## Forked Repo
+## 1.Forked Repo
 
 <img width="1225" height="672" alt="image" src="https://github.com/user-attachments/assets/7eab88c0-71b7-410d-abb2-6bcdc631198b" />
 
 -----------------
-## Git Clone
+## 2.Git Clone
 
 <img width="1223" height="540" alt="Untitled 4" src="https://github.com/user-attachments/assets/1eec6a40-71dc-4c8a-86dc-5a00446e6eeb" />
 
 ----------------
 
-## Added matching pytest case 
+## 3.dded matching pytest case 
 
 ```
 # test_app.py
@@ -203,7 +203,7 @@ tests/
 
 ----------
 
-## Create the ECR repository
+## 4.Create the ECR repository
 
 
 ```
@@ -217,7 +217,7 @@ tests/
 
 ---------
 
-## Launch the EC2 instances 
+## 5.Launch the EC2 instances 
 
 One instance runs Jenkins itself (the controller). The other is the deployment target the app actually runs on. Launch both the same way, with different names and security groups.
 
@@ -250,7 +250,7 @@ Flask-practice app Instance
 <img width="1192" height="606" alt="image" src="https://github.com/user-attachments/assets/f0c9c8ab-50f3-4594-9459-6a25c643a860" />
 
 ------------
- # Installed  Docker on both instances
+ # 6.Installed  Docker on both instances
 
 
  ```
@@ -307,7 +307,7 @@ Docker
 
 -----
 
-## AM user for Jenkins (push access)
+## 7.Created IAM user for Jenkins (push access)
 
 
 <img width="1231" height="559" alt="image" src="https://github.com/user-attachments/assets/d3bb1241-e53c-468a-a0ae-6eee9f29e37a" />
@@ -321,7 +321,7 @@ Docker
 
 ----
 
-## Install & Configure Jenkins
+## 8.Install & Configure Jenkins
 
 <img width="1234" height="244" alt="image" src="https://github.com/user-attachments/assets/a5c6f028-5052-4ce2-8b0b-4033fa80c17b" />
 
@@ -331,7 +331,7 @@ Docker
 ---
 -----
 
-## Configure the SMTP server for emailext in Jenkins
+## 9.Configure the SMTP server for emailext in Jenkins
 
 
 ```
@@ -347,12 +347,11 @@ Save, then use the built-in "test configuration" button to confirm a test email 
 <img width="1228" height="303" alt="image" src="https://github.com/user-attachments/assets/33e19947-8b3b-4d55-aa16-a22c61213b5e" />
 
 ----------
-## Configure Jenkins Credentials
 
 ------
 
 
-## Add the webhook on GitHub
+## 10.Add the webhook on GitHub
 
 ---------------------
 
@@ -366,87 +365,68 @@ Save, then use the built-in "test configuration" button to confirm a test email 
 ---------
 
 
+## ⚙️ Pipeline Stages
+
+The `Jenkinsfile` implements these **7 stages, strictly in order** — a failure in any stage halts the pipeline immediately and skips everything after it.
+
+| # | Stage | What happens |
+|---|-------|---------------|
+| 1️⃣ | **Checkout** | Pulls the latest commit from `main` |
+| 2️⃣ | **Install** | `pip install -r requirements.txt` |
+| 3️⃣ | **Test** 🧪 | Runs the full `pytest` suite — **hard gate**, nothing proceeds on failure |
+| 4️⃣ | **Build** 🐳 | Builds the Docker image, tagged `${GIT_COMMIT}` — never just `latest` |
+| 5️⃣ | **Push to ECR** ☁️ | Authenticates to AWS, pushes the SHA-tagged image |
+| 6️⃣ | **Deploy to EC2** 🚀 | SSHes into the app target, pulls the new image, **stops + removes** the old container, runs the new one |
+| 7️⃣ | **Verify** 🩺 | Curls `/health` on the deployed container — a crash-on-start is still reported as a **failed deployment** |
 
 
-## 🔄 Pipeline Stages in Detail
 
-The `Jenkinsfile` implements every stage below, in this exact order, mapped to the assignment requirements:
-
-### 1️⃣ Checkout
-Pulls the latest source from the `main` branch on every triggered build.
-
-### 2️⃣ Install Dependencies
-```bash
-python3 -m venv venv
-. venv/bin/activate
-pip install -r requirements.txt
-```
-
-### 3️⃣ Test — the quality gate 🧪
-```bash
-pytest --junitxml=test-results.xml
-```
-> ⛔ **If any test fails, the pipeline stops here.** Build, push, and deploy never run — proven in the [failure-path screenshots](#-screenshots--evidence) below.
-
-### 4️⃣ Build — SHA-tagged image 🐳
-```bash
-docker build -t $IMAGE_NAME:$IMAGE_TAG .
-```
-`IMAGE_TAG` is derived from `env.GIT_COMMIT`, so **every deployed image is traceable back to the exact commit** that produced it — never a floating `latest` tag.
-
-### 5️⃣ Push
-The tagged image is published so the deploy stage can pull a known, immutable artifact.
-
-### 6️⃣ Deploy — real container replacement 🔁
-```bash
-docker stop flask-app || true
-docker rm flask-app || true
-docker run -d --name flask-app \
-  --network $NETWORK -p <PORT>:5000 \
-  --restart unless-stopped \
-  -e MONGO_URI="$MONGO_URI" \
-  $IMAGE_NAME:$IMAGE_TAG
-```
-This **stops and removes the previously running container** before starting the new one — a genuine swap, not a parallel/duplicate install.
-
-### 7️⃣ Verify — the deploy-verification gate ❤️
-```bash
-for i in 1 2 3 4 5; do
-  sleep 4
-  STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://<host>/health || echo 000)
-  if [ "$STATUS" = "200" ]; then exit 0; fi
-done
-echo "Health check failed after 5 attempts"; exit 1
-```
-A container that starts but crashes (or never returns a healthy `/health` response) is reported as a **failed deployment** — this is not a cosmetic check, it genuinely gates the final pipeline status.
-
-### 8️⃣ Notify
-Sends the appropriate email — see below.
 
 ---
 
-## 📧 Email Notifications
+## 📬 Email Notifications
 
-Emails are sent via **Jenkins Email Extension (`emailext`)** using credential-stored SMTP settings — no credentials are ever hardcoded in the `Jenkinsfile`.
+Graded separately from *"a notification exists"* — content must **differ meaningfully by outcome** with real build details, not a generic template.
+
+<table>
+<tr>
+<td width="50%" valign="top">
 
 ### ✅ On Success
-| Included | Example |
-|---|---|
-| Clear success indicator | `✅ SUCCESS` subject prefix |
-| Commit SHA & branch | `env.GIT_COMMIT` |
-| Docker image tag | `$IMAGE_NAME:$IMAGE_TAG` |
-| Deploy target | Container / instance name |
-| Link to the pipeline run | `env.BUILD_URL` |
+
+```
+Subject: [SUCCESS] flask_Practice deployed - <SHA>
+
+Deployment succeeded.
+Branch: main
+Commit SHA: <full SHA>
+Image tag: <registry>/<repo>:<SHA>
+EC2 target: <app host>
+Run URL: <Jenkins build link>
+```
+
+</td>
+<td width="50%" valign="top">
 
 ### ❌ On Failure
-| Included | Example |
-|---|---|
-| Clear failure indicator | `❌ FAILURE` subject prefix |
-| **Which stage failed** | `env.FAILED_STAGE` (Install / Test / Build / Deploy / Verify) |
-| Commit SHA & branch | `env.GIT_COMMIT` |
-| Link to logs | `env.BUILD_URL + "console"` |
 
-> 📌 Both emails are **HTML-formatted** and content genuinely differs by outcome — this satisfies the "customized message, not a generic template" grading criterion.
+```
+Subject: [FAILED] flask_Practice pipeline - <SHA>
+
+Deployment failed.
+Branch: main
+Commit SHA: <full SHA>
+Failed stage: Test / Build / Push / Deploy / Verify
+Run URL: <Jenkins console log link>
+```
+
+</td>
+</tr>
+</table>
+
+> 💡 `env.FAILED_STAGE` is set at the **top** of every stage, before its risky command runs — so the failure email always names the exact stage that broke, not just *"the pipeline failed."* Configured via the Jenkins **Email Extension** plugin with Gmail SMTP + an App Password (never the real account password).
+
+<br>
 
 ---
 

@@ -14,6 +14,8 @@
 
 </div>
 
+
+
 <br>
 
 > **📌 What this repo proves:** every push to `main` is automatically tested, containerized, tagged with its Git commit SHA, pushed to a private ECR repository, deployed onto a live EC2 instance by replacing the running container, verified with a real `/health` check, and reported by a **distinct** success or failure email — with zero manual steps in between.
@@ -30,6 +32,16 @@
 | [💻 Local Development](#-local-development-no-docker-no-aws) | [🛠️ Manual Deploy (if Jenkins is down)](#️-manual-deployment-fallback) | [✅ Rubric Compliance](#-rubric-compliance) |
 
 <br>
+
+👉 For quick reference, you can jump directly to the evidence section here:  
+[Evidence / Screenshots](#-evidence--screenshots)
+
+This section contains:  
+- 🛠️ [Implementation Stages](#i-implementation-stages)  
+- 🧪 [Testing Stages with Output](#ii-testing-stages-with-output)  
+   - ✅ [Output A - Successful Pipeline Execution](#output-a---successful-pipeline-execution)  
+   - ❌ [Output B - Pipeline Failing Test](#output-b---pipeline-failing-test)
+
 
 ---
 
@@ -304,14 +316,10 @@ The **Test** stage is a hard gate — `pytest` failing stops the pipeline outrig
 
 ## 🖼️ Evidence / Screenshots
 
-## 🔄  $\Large{\textcolor{#87CEEB}{\textbf{ I.Implementation Stages }}}$
-
-## 🔄  $\Large{\textcolor{#87CEEB}{\textbf{ II.Testing Stages }}}$
- 
+##  "📜 Below are sequential screenshot evidences documenting implementation and testing."
 
 
-
-# 🔄  $\Large{\textcolor{#87CEEB}{\textbf{ I.Implementation Stages }}}$
+# 🔧  $\Large{\textcolor{#87CEEB}{\textbf{ I.Implementation Stages }}}$
 
 ## 1.Forked Repo
 
@@ -676,17 +684,14 @@ pipeline {
 
 
 
-# 🧪  $\Large{\textcolor{#87CEEB}{\textbf{ II.Testing Stages }}}$
+# 🧪  $\Large{\textcolor{#87CEEB}{\textbf{ II.Testing Stages with output }}}$
 
-✅ I have validated the pipeline for both successful and intentional failure test cases.
+## ✅ I have validated the pipeline for both successful and intentional failure test cases.
+
+## i) Output  A - Successfull Pipeline Execution 
+## ii) Output B - Pipeline Failing test
  
-## $\Large{\textcolor{#87CEEB}{\textbf{Output A }}}$ -  Successfull Pipeline Execution 
-
-## $\Large{\textcolor{#87CEEB}{\textbf{Output B }}}$  -  Pipeline Failing test
-
-
-
-# $\Large{\textcolor{#87CEEB}{\textbf{Output A }}}$ -  Successfull Pipeline Execution 
+## $\Large{\textcolor{#87CEEB}{\textbf{ i. Output A }}}$ -  Successfull Pipeline Execution 
 
 ## ⬆️ 1.Code committed and pushed from VS Code to GitHub
 
@@ -710,7 +715,7 @@ pipeline {
 <img width="1405" height="395" alt="Untitled 7" src="https://github.com/user-attachments/assets/d6a0a944-f745-47df-9c4e-4308494aac07" />
 
 
-#  ✅ 6.Full pipeline run — all stages green
+##  ✅ 6.Full pipeline run — all stages green
 
 <img width="1393" height="711" alt="Untitled 8" src="https://github.com/user-attachments/assets/414c6482-e1e8-48a6-b6aa-b99fc3762fb6" />
 
@@ -765,7 +770,7 @@ Jenkins console output validates the application health endpoint returned 200 OK
 
 
 
-# $\Large{\textcolor{#87CEEB}{\textbf{Output B }}}$  -  Pipeline Failing test
+## $\Large{\textcolor{#87CEEB}{\textbf{ii.Output B }}}$  -  Pipeline Failing test
 
 
 ### 🛑 Intentionally broken run — pipeline stops early

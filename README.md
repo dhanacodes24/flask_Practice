@@ -33,17 +33,19 @@
 
 <br>
 
-👉 For quick reference, you can jump directly to the evidence section here:  
-[Evidence / Screenshots](#-evidence--screenshots)
+👉 For quick reference, you can jump directly to the evidence section here:  [🖼️ Evidence / Screenshots](#-evidence--screenshots)
 
-This section contains:  
-- 🛠️ [Implementation Stages](#i-implementation-stages)  
-- 🧪 [Testing Stages with Output](#ii-testing-stages-with-output)  
-   - ✅ [Output A - Successful Pipeline Execution](#output-a---successful-pipeline-execution)  
-   - ❌ [Output B - Pipeline Failing Test](#output-b---pipeline-failing-test)
-
-
----
+```
+Evidence / Screenshots
+│
+├── I. Implementation Stages 🛠️
+│
+└── II. Testing Stages with Output 🧪
+    │
+    ├── Output A - Successful Pipeline Execution ✅
+    │
+    └── Output B - Pipeline Failing Test ❌
+```
 
 ## 🏗️ Architecture
 

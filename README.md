@@ -36,6 +36,9 @@
 👉 For quick reference, you can jump directly to the evidence section here:  
 - [Evidence / Screenshots](#evidence--screenshots)
 
+
+| [🩺 Health Check Gate](#-health-check-verification-gate) | [🧪 Testing](#-testing) | [🖼️ Evidence / Screenshots](#️-evidence--screenshots) |
+
 ---
 
 ## 🖼️ Evidence / Screenshots

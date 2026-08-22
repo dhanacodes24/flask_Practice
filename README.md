@@ -35,11 +35,10 @@
 
 👉 For quick reference, you can jump directly to the evidence section here: | [🖼️ Evidence / Screenshots](#️-evidence--screenshots) |
 
----
+```
 
 ## 🖼️ Evidence and Screenshots
 
-```
 Evidence / Screenshots
 │
 ├── I. Implementation Stages 🛠️
@@ -318,11 +317,12 @@ The **Test** stage is a hard gate — `pytest` failing stops the pipeline outrig
 
 <br>
 
----
+-------------------------------
 
-## 🖼️ Evidence / Screenshots
+# 🖼️ Evidence / Screenshots
+-----------------------------
 
-##  "📜 Below are sequential screenshot evidences documenting implementation and testing."
+##  📜 Below are sequential screenshot evidences documenting implementation and testing.
 
 
 # 🔧  $\Large{\textcolor{#87CEEB}{\textbf{ I.Implementation Stages }}}$

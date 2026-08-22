@@ -25,7 +25,7 @@
 7. [Pipeline Stages](#-pipeline-stages-in-detail)
 8. [Email Notifications](#-email-notifications)
 9. [Secrets Management](#-secrets-management)
-11. [A full pipeline run Screenshots & Evidence](#a-full-pipeline-run-screenshots--evidence) ✅
+11. [A full pipeline run Screenshots & Evidence](#a-full-pipeline-run-screenshots-and-evidence) ✅
 12. [Author](#-author)
 
 ---
@@ -141,7 +141,7 @@ docker build -t flask-student-app:local .
 <img width="1225" height="672" alt="image" src="https://github.com/user-attachments/assets/7eab88c0-71b7-410d-abb2-6bcdc631198b" />
 
 -----------------
-**Git Clone
+## Git Clone
 
 <img width="1223" height="540" alt="Untitled 4" src="https://github.com/user-attachments/assets/1eec6a40-71dc-4c8a-86dc-5a00446e6eeb" />
 
@@ -477,30 +477,87 @@ All sensitive values live in **Jenkins Credentials** — nothing is committed to
 
 ---
 
-## A full pipeline run Screenshots & Evidence
 
-## 📸 Screenshots & Evidence Pipeline stages present and passing in correct order 
+# 🔄  $\Large{\textcolor{#87CEEB}{\textbf{A full pipeline run Screenshots and Evidence}}}$
+ 
+## $\Large{\textcolor{#87CEEB}{\textbf{Output A }}}$ -  Successfull Pipeline Execution 
+
+## ⬆️ Code committed and pushed from VS Code to GitHub
+
+<img width="1007" height="523" alt="Untitled 5" src="https://github.com/user-attachments/assets/e47b9d5e-b151-48f6-b9f6-8d8899b3f513" />
+
+## Latest commits are propagated to the GitHub repository
+
+<img width="1007" height="556" alt="image" src="https://github.com/user-attachments/assets/4904c310-94a7-4db3-9e3f-dbc2ebcfa21e" />
+
+## GitHub Webhook confirms last delivery was successful
+
+<img width="1010" height="367" alt="image" src="https://github.com/user-attachments/assets/0264ff4a-a261-4699-9d0f-fc8f50425e39" />
+
+## Verified ECR images on the application server
+
+<img width="1390" height="200" alt="Untitled 6" src="https://github.com/user-attachments/assets/67f3c6f5-bd04-4a4f-9bc5-83121cf2b794" />
 
 
-## Output A -  Successfull Pipeline Execution 
+## 🔎 Confirmed ECR images via AWS Console
 
-### 1. ✅ Full pipeline run — all stages green
-```
-[ 📷 PASTE SCREENSHOT HERE — Jenkins Stage View, Checkout → Notify, all green ]
-```
-
-### 2. 📧 Success email received
-```
-[ 📷 PASTE SCREENSHOT HERE — inbox showing the ✅ SUCCESS email with commit/image/link ]
-```
-
-### 5. 🌐 Live application check
-```
-[ 📷 PASTE SCREENSHOT HERE — browser or curl output confirming the app is live and /health returns 200 ]
-```
+<img width="1405" height="395" alt="Untitled 7" src="https://github.com/user-attachments/assets/d6a0a944-f745-47df-9c4e-4308494aac07" />
 
 
-## Output B -  Pipeline Failing test
+#  ✅ Full pipeline run — all stages green
+
+<img width="1393" height="711" alt="Untitled 8" src="https://github.com/user-attachments/assets/414c6482-e1e8-48a6-b6aa-b99fc3762fb6" />
+
+
+ ## 📧 Successful deployment notification email received
+ 
+<img width="1012" height="355" alt="image" src="https://github.com/user-attachments/assets/91cf709a-6071-412f-afbb-f5b6d9f67ef8" />
+
+
+## 📜 Jenkins job console output screenshot 
+
+<img width="1095" height="576" alt="image" src="https://github.com/user-attachments/assets/404e6d70-e416-4405-93a1-3a1b79398aac" />
+
+##  Live application check
+
+## 🌐 Application endpoint verified as reachable
+
+<img width="1630" height="646" alt="image" src="https://github.com/user-attachments/assets/11935ff4-3b37-458b-b5c4-a6079498ed68" />
+
+## 🟢 Health check node successfully registered
+<img width="1153" height="264" alt="image" src="https://github.com/user-attachments/assets/d1b8c7b0-5b97-45ae-b94c-0baa5271aa61" />
+
+## 📝 Student data added via application
+
+<img width="1163" height="400" alt="image" src="https://github.com/user-attachments/assets/2ae7e021-aa02-43bd-a06e-0225956015c7" />
+
+## 📊 Verified student record persisted in MongoDB
+
+<img width="1161" height="499" alt="image" src="https://github.com/user-attachments/assets/edf92c25-0e76-413e-87d3-69c0bbab4a94" />
+
+## 🖥️ Jenkins console snippet included as supporting evidence for push, deployment, and verification steps
+
+## Docker Push 
+
+Console output confirms image was pushed to ECR.
+
+<img width="863" height="264" alt="image" src="https://github.com/user-attachments/assets/b85fdb8a-536e-413d-9753-5520f8e83bf9" />
+
+
+## Deployment to EC2 actually replaces the running container
+Console logs show the existing container was stopped, removed, and replaced with the latest image.
+
+
+<img width="1329" height="333" alt="image" src="https://github.com/user-attachments/assets/f61983ea-ff1a-45dc-8aa6-23b3cda22160" />
+
+## Deployment Verification (Health check)
+
+Jenkins console output validates the application health endpoint returned 200 OK.
+
+<img width="1329" height="333" alt="image" src="https://github.com/user-attachments/assets/ec429b4a-13d9-43c4-88de-79f818597cb1" />
+
+
+## $\Large{\textcolor{#87CEEB}{\textbf{Output A }}}$ Output B }}}$ -  Pipeline Failing test
 
 
 ### 3. 🛑 Intentionally broken run — pipeline stops early

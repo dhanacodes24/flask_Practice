@@ -543,6 +543,7 @@ Console output confirms image was pushed to ECR.
 
 <img width="863" height="264" alt="image" src="https://github.com/user-attachments/assets/b85fdb8a-536e-413d-9753-5520f8e83bf9" />
 
+<img width="866" height="192" alt="image" src="https://github.com/user-attachments/assets/886db95b-29cc-4b39-b870-5b548cf91cc0" />
 
 ## Deployment to EC2 actually replaces the running container
 Console logs show the existing container was stopped, removed, and replaced with the latest image.
@@ -557,26 +558,52 @@ Jenkins console output validates the application health endpoint returned 200 OK
 <img width="1329" height="333" alt="image" src="https://github.com/user-attachments/assets/ec429b4a-13d9-43c4-88de-79f818597cb1" />
 
 
-## $\Large{\textcolor{#87CEEB}{\textbf{Output A }}}$ Output B }}}$ -  Pipeline Failing test
 
 
-### 3. 🛑 Intentionally broken run — pipeline stops early
-```
-[ 📷 PASTE SCREENSHOT HERE — Stage View showing the pipeline halting at the failing stage ]
-```
 
-### 4. 📧 Failure email — correct failed-stage information
-```
-[ 📷 PASTE SCREENSHOT HERE — inbox showing the ❌ FAILURE email naming the correct stage ]
-```
+## $\Large{\textcolor{#87CEEB}{\textbf{Output B }}}$  -  Pipeline Failing test
+
+
+### 🛑 Intentionally broken run — pipeline stops early
+
+ 1. Set Response code to 999
+
+<img width="720" height="129" alt="image" src="https://github.com/user-attachments/assets/539e6bc5-339a-4e69-a993-2fbc4a0d7a8d" />
+
+ 2.  ⬆️ Code committed and pushed from VS Code to GitHub
+
+<img width="1184" height="707" alt="image" src="https://github.com/user-attachments/assets/e5e4f56c-b586-475e-8270-a9f17e6b086e" />
+
+3.  Latest commits are propagated to the GitHub repository
+
+<img width="1193" height="592" alt="image" src="https://github.com/user-attachments/assets/c8cf3514-731c-4a58-95de-0afcb49cea40" />
+
+4. GitHub Webhook confirms last delivery was successful
+   
+<img width="1191" height="393" alt="image" src="https://github.com/user-attachments/assets/8c7b6146-9270-49d1-8073-862ad088c628" />
+
+5. •  "⚠️ Jenkins job halted at the Testing stage, as shown in the screenshot below."
+
+   <img width="1196" height="674" alt="Untitled 11" src="https://github.com/user-attachments/assets/50131e30-e1b1-4e34-a539-7ea1e5c8c835" />
+
+6. 📧 Failure email — correct failed-stage information
+
+<img width="1202" height="377" alt="image" src="https://github.com/user-attachments/assets/9f76ebc2-1409-491a-bc6c-b24728c1ebca" />
+
 
 ### 5. 🌐 Live application check
-```
-[ 📷 PASTE SCREENSHOT HERE — browser or curl output confirming the app is live and /health returns 200 ]
-```
+
+<img width="1625" height="449" alt="image" src="https://github.com/user-attachments/assets/d0b23d6c-8934-46d3-a4a6-f25ea32c0ab6" />
+
 
 ---
 
+🛑 Jenkins Console snippet attached to validate failure at the Test stage
+"⚠️ Jenkins console snippet highlights the invalid assertion (assert resp.status_code in == 999), aligning with our intentional failure testing."
+
+<img width="1604" height="797" alt="image" src="https://github.com/user-attachments/assets/6300c4ef-8ade-4f67-ad85-46755ace985c" />
+
+<img width="1453" height="363" alt="image" src="https://github.com/user-attachments/assets/41307811-6463-4650-824f-69ddef550001" />
 
 ## 👤 Author
 

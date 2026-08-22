@@ -33,7 +33,12 @@
 
 <br>
 
-👉 For quick reference, you can jump directly to the evidence section here:  [🖼️ Evidence / Screenshots](#-evidence--screenshots)
+👉 For quick reference, you can jump directly to the evidence section here:  
+- [Evidence / Screenshots](#evidence--screenshots)
+
+---
+
+## 🖼️ Evidence / Screenshots
 
 ```
 Evidence / Screenshots
